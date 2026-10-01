@@ -1,16 +1,15 @@
-
 local vim = vim
-local Plug = vim.fn['plug#']
-
-vim.call('plug#begin')
-
-Plug('sainnhe/gruvbox-material')
-Plug('nvim-lualine/lualine.nvim')
-Plug('nvim-treesitter/nvim-treesitter', {['do'] = ':TSUpdate'})
-Plug('neovim/nvim-lspconfig')
-Plug ('m4xshen/autoclose.nvim')
-
-vim.call('plug#end')
+local gh = function(repo)
+    return "https://github.com/" .. repo
+end
+vim.pack.add({
+	gh('sainnhe/gruvbox-material'),
+	gh('nvim-lualine/lualine.nvim'),
+	gh('nvim-treesitter/nvim-treesitter'),
+	gh('neovim/nvim-lspconfig'),
+	gh('m4xshen/autoclose.nvim'),
+	gh('folke/todo-comments.nvim'),
+})
 
 --GENERAL
 vim.wo.number = true --line numbers
@@ -21,11 +20,14 @@ vim.opt.shiftwidth = 4
 vim.opt.autoindent = true
 vim.opt.scrolloff = 99999999
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)--sync neovims clipboard with OS clipboard
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>') --clears hl if you press esc in normal mode 
 
 --COLORSCHEME
 vim.g.gruvbox_material_background = 'hard'
 vim.cmd.colorscheme("gruvbox-material")
 
+--TODO-COMMENTS
+require('todo-comments').setup { signs = false }
 --AUTOCLOSE
 require("autoclose").setup()
 
