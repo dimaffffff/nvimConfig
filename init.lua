@@ -4,6 +4,7 @@ local gh = function(repo)
 end
 vim.pack.add({
 	gh('sainnhe/gruvbox-material'),
+	gh('folke/tokyonight.nvim'),
 	gh('nvim-lualine/lualine.nvim'),
 	gh('nvim-treesitter/nvim-treesitter'),
 	gh('neovim/nvim-lspconfig'),
@@ -63,8 +64,7 @@ vim.lsp.enable('lua_ls')
 local clangd_opts = {}
 vim.lsp.enable('clangd', clangd_opts)
 --Python
-vim.lsp.enable('pyright')
-
+vim.lsp.enable('basedpyright')
 
 
 --General LSP config
