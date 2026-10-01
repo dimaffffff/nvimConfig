@@ -5,8 +5,10 @@ local Plug = vim.fn['plug#']
 vim.call('plug#begin')
 
 Plug('sainnhe/gruvbox-material')
-Plug('nvim-lualine/lualine.nvim') 
+Plug('nvim-lualine/lualine.nvim')
 Plug('nvim-treesitter/nvim-treesitter', {['do'] = ':TSUpdate'})
+Plug('neovim/nvim-lspconfig')
+Plug ('m4xshen/autoclose.nvim')
 
 vim.call('plug#end')
 
@@ -23,6 +25,9 @@ vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)--sync neovims clipb
 --COLORSCHEME
 vim.g.gruvbox_material_background = 'hard'
 vim.cmd.colorscheme("gruvbox-material")
+
+--AUTOCLOSE
+require("autoclose").setup()
 
 --LUALINE
 require("conflualine")
@@ -46,3 +51,25 @@ for i,v in ipairs(fileExtensions) do
 	  end
 	})
 end
+
+
+--LSP
+vim.lsp.inlay_hint.enable(true)
+--Lua
+vim.lsp.enable('lua_ls')
+--C
+local clangd_opts = {}
+vim.lsp.enable('clangd', clangd_opts)
+--Python
+vim.lsp.enable('pyright')
+
+
+
+--General LSP config
+vim.diagnostic.config({
+  virtual_text = true,
+  signs = true,
+  update_in_insert = false,
+  underline = true,
+})
+
