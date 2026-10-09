@@ -1,7 +1,23 @@
 local vim = vim
+
+vim.g.mkdp_echo_preview_url = 1
+--UPDATE AUTOCMD
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+		if ev.data.spec.name == 'markdown-preview.nvim' then
+			if ev.data.kind == 'update' or ev.data.kind == 'install' then
+				local path = ev.data.path .. 'app'
+				vim.system.chdir {cwd = path}
+				vim.fn['mkdp#util#install'](ev.data.spec.name)
+			end
+		end
+	end
+})
+--PLUGIN INSTALL
 local gh = function(repo)
     return "https://github.com/" .. repo
 end
+
 vim.pack.add({
 	gh('sainnhe/gruvbox-material'),
 	gh('folke/tokyonight.nvim'),
@@ -10,6 +26,7 @@ vim.pack.add({
 	gh('neovim/nvim-lspconfig'),
 	gh('m4xshen/autoclose.nvim'),
 	gh('folke/todo-comments.nvim'),
+	gh('iamcco/markdown-preview.nvim')
 })
 
 --GENERAL
@@ -23,12 +40,14 @@ vim.opt.scrolloff = 99999999
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)--sync neovims clipboard with OS clipboard
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>') --clears hl if you press esc in normal mode 
 
+
 --COLORSCHEME
 vim.g.gruvbox_material_background = 'hard'
 vim.cmd.colorscheme("gruvbox-material")
 
 --TODO-COMMENTS
 require('todo-comments').setup { signs = false }
+
 --AUTOCLOSE
 require("autoclose").setup()
 
@@ -41,8 +60,8 @@ require('nvim-treesitter').setup {
   install_dir = vim.fn.stdpath('data') .. '/site'
 }
 
-require('nvim-treesitter').install { 'c', 'python', 'lua' }
-local fileExtensions = { 'c' , 'py' , 'lua' }
+require('nvim-treesitter').install { 'c', 'python', 'lua', 'markdown' }
+local fileExtensions = { 'c' , 'py' , 'lua' , 'md'}
 
 for i,v in ipairs(fileExtensions) do
 	vim.api.nvim_create_autocmd('FileType', {
@@ -66,25 +85,23 @@ vim.lsp.enable('clangd', clangd_opts)
 vim.lsp.enable('basedpyright')
 
 --Autocompletion
-vim.api.nvim_create_autocmd('LspAttach', {
+vim.api.nvim_create_autocmd('lspattach', {
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if not client then return end
 
     vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
 
-    -- Bring completion back after backspace
-    local last_len = 0
 
-    vim.api.nvim_create_autocmd('TextChangedI', {
+    vim.api.nvim_create_autocmd('textchangedi', {
       buffer = ev.buf,
       callback = function()
         local line = vim.api.nvim_get_current_line()
         local col = vim.api.nvim_win_get_cursor(0)[2]
-        local deleted = #line < last_len
-        last_len = #line
+        -- local deleted = #line < last_len
+        -- last_len = #line
 
-        if deleted and vim.fn.pumvisible() == 0 and line:sub(col, col):match('[%w_]') then
+        if vim.fn.pumvisible() == 0 and line:sub(col, col):match('[%w_]') then
           vim.lsp.completion.get()
         end
       end,
@@ -102,4 +119,5 @@ vim.diagnostic.config({
   update_in_insert = false,
   underline = true,
 })
-
+--TABS
+vim.keymap.set('n', '<M-l>', '<cmd>tabn<CR>')
